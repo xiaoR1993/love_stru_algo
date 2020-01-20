@@ -1,4 +1,4 @@
-package com.zyr.链表;
+package com.zyr._05链表;
 
 /**
  * @author 张业荣

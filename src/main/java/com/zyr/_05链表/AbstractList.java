@@ -1,4 +1,4 @@
-package com.zyr.链表;
+package com.zyr._05链表;
 
 /**
  * @author 张业荣
@@ -58,7 +58,7 @@ public abstract class AbstractList<E> implements List<E> {
      * @param index
      */
     protected void rangeCheckForAdd(int index) {
-        if (index < 0 || index >= size - 1) {
+        if (index < 0 || index > size) {
             outOfBounds(index);
         }
     }

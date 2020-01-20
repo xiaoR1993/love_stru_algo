@@ -1,14 +1,16 @@
-package com.zyr.链表;
+package com.zyr._04数组;
 
 /**
  * @author 张业荣
- * @Description 链表测试类
- * @Date 2020/1/5
+ * @Title 测试类
+ * @Description 测试类
+ * @Date 2020/1/3
  */
 public class Main {
 
     public static void main(String[] args) {
-        List<Integer> list = new LinkedList<>();
+        //测试Integer
+        ArrayList<Integer> list = new ArrayList<>();
         list.add(10);
         list.add(20);
         list.add(30);

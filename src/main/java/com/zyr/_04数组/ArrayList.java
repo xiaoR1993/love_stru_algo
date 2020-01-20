@@ -1,6 +1,6 @@
-package com.zyr.数组;
+package com.zyr._04数组;
 
-import com.zyr.链表.AbstractList;
+import com.zyr._05链表.AbstractList;
 
 import java.util.Objects;
 
