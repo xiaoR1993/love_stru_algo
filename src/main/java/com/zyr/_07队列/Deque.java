@@ -8,6 +8,11 @@ import com.zyr._05链表.List;
  * @Description double ended queue 双端队列
  * @Date 2020/1/20
  */
+
+/**
+ * 使用链表实现双端队列
+ * @param <E>
+ */
 public class Deque<E>
 {
 	// 使用双向链表实现队列

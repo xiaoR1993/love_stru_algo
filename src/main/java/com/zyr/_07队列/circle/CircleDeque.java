@@ -1,32 +1,28 @@
 package com.zyr._07队列.circle;
 
-import javax.swing.text.AbstractDocument;
-import java.util.Objects;
-
 /**
  * @author zyr
- * @Description 循环队列 使用动态数组实现的队列
+ * @Description 双向循环队列 使用动态数组实现的队列
  * @Date 2020/1/20
  */
 
 /**
- * 使用优化型动态数组实现循环队列 使用front来记录队头位置 需要转换真实索引与标准索引得位置
- * 使用index方法来获取标准索引到真实索引
+ * 因为有可能真实索引为负数的情况 需要进行转换
  * @param <E>
  */
-public class CircleQueue<E>
+public class CircleDeque<E>
 {
 	private int front;
 	private int size;
 	private E[] elements;
 	private static final int DEFAULT_CAPACITY = 10;
 
-	public CircleQueue()
+	public CircleDeque()
 	{
 		this(DEFAULT_CAPACITY);
 	}
 
-	public CircleQueue(int capaticy)
+	public CircleDeque(int capaticy)
 	{
 		//初始化size
 		capaticy = (capaticy < DEFAULT_CAPACITY) ? DEFAULT_CAPACITY : capaticy;
@@ -63,7 +59,22 @@ public class CircleQueue<E>
 	 *
 	 * @param element
 	 */
-	public void enQueue(E element)
+	public void enQueueFront(E element)
+	{
+		ensureCapacity(size + 1);
+		front = index(-1);
+		elements[front] = element;
+
+		size++;
+
+	}
+
+	/**
+	 * 从队尾入队
+	 *
+	 * @return
+	 */
+	public void enQueueRear(E element)
 	{
 		ensureCapacity(size + 1);
 		elements[index(size)] = element;
@@ -71,18 +82,31 @@ public class CircleQueue<E>
 	}
 
 	/**
-	 * 出队
+	 * 从队尾出队
 	 *
 	 * @return
 	 */
-	public E deQueue()
+	public E deQueueRear()
+	{
+		int rear = rearIndex();
+		E ele = elements[rear];
+		elements[rear] = null;
+		size--;
+		return ele;
+	}
+
+	/**
+	 * 从队头出队
+	 *
+	 * @return
+	 */
+	public E deQueueFront()
 	{
 		E ele = elements[front];
 		elements[front] = null;
 		front = index(1);
 		size--;
 		return ele;
-
 	}
 
 	/**
@@ -93,7 +117,16 @@ public class CircleQueue<E>
 	public E front()
 	{
 		return elements[front];
+	}
 
+	/**
+	 * 获取队尾的元素
+	 *
+	 * @return
+	 */
+	public E rear()
+	{
+		return elements[rearIndex()];
 	}
 
 	/**
@@ -104,8 +137,23 @@ public class CircleQueue<E>
 	 */
 	private int index(int index)
 	{
+		// 这里是进行负值的处理
+		index += front;
+		if (index < 0)
+		{
+			return index + elements.length;
+		}
 		return index - (index >= elements.length ? elements.length : 0);
-		//		return (front + index) % elements.length;
+	}
+
+	/**
+	 * 获取队尾的真实索引
+	 *
+	 * @return
+	 */
+	private int rearIndex()
+	{
+		return index(size - 1);
 	}
 
 	/**

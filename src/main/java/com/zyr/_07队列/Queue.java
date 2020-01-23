@@ -8,6 +8,11 @@ import com.zyr._05链表.List;
  * @Description 队列
  * @Date 2020/1/20
  */
+
+/**
+ * 总结:使用链表实现队列
+ * @param <E>
+ */
 public class Queue<E>
 {
 	// 使用双向链表实现队列
