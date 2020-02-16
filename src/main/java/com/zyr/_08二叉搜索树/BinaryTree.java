@@ -5,33 +5,23 @@ import com.zyr._08二叉搜索树.printer.BinaryTreeInfo;
 import java.util.*;
 
 /**
- * @author zyr
- * @Description 二叉搜索树
- * @Date 2020/1/21
+ * @author 张业荣
+ * @Description 二叉树
+ * @Date 2020/1/30
  */
-public class BinarySearchTree<E> implements BinaryTreeInfo
+@SuppressWarnings({ "unused", "unchecked" }) public class BinaryTree<E> implements BinaryTreeInfo
 {
-	private int size;
-	private Node<E> root;
-	private Comparator<E> comparator;
+	// 主要屬性
+	protected int size;
+	protected BST.Node<E> root;
 
-	public BinarySearchTree()
+	// 内部类
+	protected static class Node<E>
 	{
-		this(null);
-	}
-
-	public BinarySearchTree(Comparator<E> comparator)
-	{
-		this.comparator = comparator;
-	}
-
-	public static class Node<E>
-	{
-
-		E element;
-		Node<E> left;
-		Node<E> right;
-		Node<E> parent;
+		public E element;
+		public Node<E> left;
+		public Node<E> right;
+		public Node<E> parent;
 
 		public Node(E element, Node<E> parent)
 		{
@@ -49,7 +39,55 @@ public class BinarySearchTree<E> implements BinaryTreeInfo
 			return left != null && right != null;
 		}
 
+		public boolean isLeftChild()
+		{
+			return parent != null && this == parent.left;
+		}
+
+		public boolean isRightChild()
+		{
+			return parent != null && this == parent.right;
+		}
+
+		/**
+		 * 返回兄弟节点
+		 * @return
+		 */
+		public Node<E> sibling()
+		{
+			if (isLeftChild())
+			{
+				return parent.right;
+			}
+			if (isRightChild())
+			{
+				return parent.left;
+			}
+
+			return null;
+
+		}
+
 	}
+
+	public static abstract class Visitor<E>
+	{
+		// 控制停止装置
+		boolean stop;
+
+		/**
+		 * @return 如果返回true，就代表停止遍历
+		 */
+		public abstract boolean visit(E element);
+
+	}
+
+	protected Node<E> createNode(E element, Node<E> parent)
+	{
+		return new Node<>(element, parent);
+	}
+
+	// =============================== 常规方法  =============================== //
 
 	public int size()
 	{
@@ -67,87 +105,7 @@ public class BinarySearchTree<E> implements BinaryTreeInfo
 		size = 0;
 	}
 
-	public void add(E element)
-	{
-		elementNotNullCheck(element);
-
-		// 添加第一个节点
-		if (root == null)
-		{
-			root = new Node<>(element, null);
-			size++;
-			return;
-		}
-
-		// 添加的不是第一个节点
-		// 找到父节点
-		Node<E> parent = root;
-		Node<E> node = root;
-		int cmp = 0;
-		do
-		{
-			cmp = compare(element, node.element);
-			parent = node;
-			if (cmp > 0)
-			{
-				node = node.right;
-			}
-			else if (cmp < 0)
-			{
-				node = node.left;
-			}
-			else
-			{ // 相等
-				node.element = element;
-				return;
-			}
-
-		}
-		while (node != null);
-
-		// 看看插入到父节点的哪个位置
-		Node<E> newNode = new Node<>(element, parent);
-		if (cmp > 0)
-		{
-			parent.right = newNode;
-		}
-		else
-		{
-			parent.left = newNode;
-		}
-	}
-
-	/**
-	 * @return 返回值等于0，代表e1和e2相等；返回值大于0，代表e1大于e2；返回值小于于0，代表e1小于e2
-	 */
-	private int compare(E e1, E e2)
-	{
-		if (comparator != null)
-		{
-			return comparator.compare(e1, e2);
-		}
-
-		return ((Comparable) e1).compareTo(e2);
-
-	}
-
-	private void elementNotNullCheck(E element)
-	{
-		if (element == null)
-		{
-			throw new IllegalArgumentException("element must not be null");
-		}
-	}
-
-	public void remove(E element)
-	{
-	}
-
-	public boolean contains(E element)
-	{
-
-		return false;
-	}
+	// =============================== 二叉树遍历  =============================== //
 
 	/**
 	 * 前序遍历二叉树
@@ -161,23 +119,6 @@ public class BinarySearchTree<E> implements BinaryTreeInfo
 
 		preorder(root, visitor);
 
-	}
-
-	/**
-	 * 递归实现前序遍历
-	 * 总结:前序遍历使用递归 比较简单 三段式
-	 *
-	 * @param node
-	 * @param visitor
-	 */
-	private void preorder(Node<E> node, Visitor<E> visitor)
-	{
-		if (node == null || visitor.stop)
-			return;
-
-		visitor.stop = visitor.visit(node.element);
-		preorder(node.left, visitor);
-		preorder(node.right, visitor);
 	}
 
 	/**
@@ -319,25 +260,6 @@ public class BinarySearchTree<E> implements BinaryTreeInfo
 	}
 
 	/**
-	 * 递归实现中序遍历
-	 *
-	 * @param node
-	 * @param visitor
-	 */
-	private void inorder(Node<E> node, Visitor<E> visitor)
-	{
-		if (node == null || visitor.stop)
-			return;
-
-		inorder(node.left, visitor);
-		if (visitor.stop)
-			return;
-		visitor.stop = visitor.visit(node.element);
-		inorder(node.right, visitor);
-
-	}
-
-	/**
 	 * 使用迭代的方式中序遍历二叉树
 	 * 使用指针指向左 入栈本节点 节点访问完指针指向右
 	 *
@@ -432,21 +354,6 @@ public class BinarySearchTree<E> implements BinaryTreeInfo
 			return;
 
 		postorder(root, visitor);
-
-	}
-
-	private void postorder(Node<E> node, Visitor<E> visitor)
-	{
-		if (node == null || visitor.stop)
-			return;
-
-		postorder(node.left, visitor);
-		postorder(node.right, visitor);
-
-		if (visitor.stop)
-			return;
-
-		visitor.stop = visitor.visit(node.element);
 
 	}
 
@@ -603,33 +510,6 @@ public class BinarySearchTree<E> implements BinaryTreeInfo
 	}
 
 	/**
-	 * 计算二叉树的高度 使用递归方法
-	 *
-	 * @return
-	 */
-	public int height2()
-	{
-		/**
-		 * 思路
-		 * 		1.其实就是前序递归方式
-		 *
-		 */
-		return height2(root);
-
-	}
-
-	private int height2(Node<E> root)
-	{
-		// 空树
-		if (root == null)
-			return 0;
-
-		// 关键点在于这个 其实是从最简单的开始 以及明白二叉树递归的遍历原理
-		return 1 + Math.max(height2(root.left), height2(root.right));
-
-	}
-
-	/**
 	 * 判断是否为完全二叉树
 	 *
 	 * @return
@@ -685,38 +565,28 @@ public class BinarySearchTree<E> implements BinaryTreeInfo
 	}
 
 	/**
-	 * 根据元素内容获取节点
+	 * 计算二叉树的高度 使用递归方法
 	 *
-	 * @param element
 	 * @return
 	 */
-	public Node<E> node(E element)
+	public int height2()
 	{
-		elementNotNullCheck(element);
+		/**
+		 * 思路
+		 * 		1.其实就是前序递归方式
+		 *
+		 */
+		return height2(root);
 
-		Node<E> node = root;
-
-		while (node != null)
-		{
-			int cmp = compare(element, node.element);
-
-			if (cmp == 0)
-				return node;
-
-			if (cmp > 0)
-			{
-				node = node.right;
-			}
-			else
-			{
-				node = node.left;
-			}
-		}
-
-		return node;
 	}
 
-	@SuppressWarnings("unused") public Node<E> predecessor(Node<E> node)
+	/**
+	 * 找到前驱
+	 *
+	 * @param node
+	 * @return
+	 */
+	public Node<E> predecessor(Node<E> node)
 	{
 		/**
 		 * 思路:
@@ -802,17 +672,7 @@ public class BinarySearchTree<E> implements BinaryTreeInfo
 		return null;
 	}
 
-	public static abstract class Visitor<E>
-	{
-		// 控制停止装置
-		boolean stop;
-
-		/**
-		 * @return 如果返回true，就代表停止遍历
-		 */
-		public abstract boolean visit(E element);
-
-	}
+	// =============================== 打印方法  =============================== //
 
 	/**
 	 * who is the root node
@@ -829,7 +689,7 @@ public class BinarySearchTree<E> implements BinaryTreeInfo
 	 */
 	@Override public Object left(Object node)
 	{
-		return ((Node) node).left;
+		return ((BST.Node) node).left;
 	}
 
 	/**
@@ -839,7 +699,7 @@ public class BinarySearchTree<E> implements BinaryTreeInfo
 	 */
 	@Override public Object right(Object node)
 	{
-		return ((Node) node).right;
+		return ((BST.Node) node).right;
 	}
 
 	/**
@@ -849,7 +709,26 @@ public class BinarySearchTree<E> implements BinaryTreeInfo
 	 */
 	@Override public Object string(Object node)
 	{
-		return ((Node) node).element;
+//		return ((BST.Node) node).element;
+		return node;
+	}
+
+	// =============================== 打印方法  =============================== //
+
+	/**
+	 * 前序遍历 加标识
+	 *
+	 * @param sb
+	 * @param node
+	 * @param prefix
+	 */
+	private void toString(StringBuilder sb, BST.Node<E> node, String prefix)
+	{
+		if (node == null)
+			return;
+		sb.append(prefix).append(node.element).append("\n");
+		toString(sb, node.left, prefix + "{L}-");
+		toString(sb, node.right, prefix + "{R}-");
 	}
 
 	@Override public String toString()
@@ -860,20 +739,68 @@ public class BinarySearchTree<E> implements BinaryTreeInfo
 		return sb.toString();
 	}
 
+	// =============================== 私有方法  =============================== //
+
 	/**
-	 * 前序遍历 加标识
+	 * 递归实现前序遍历
+	 * 总结:前序遍历使用递归 比较简单 三段式
 	 *
-	 * @param sb
 	 * @param node
-	 * @param prefix
+	 * @param visitor
 	 */
-	private void toString(StringBuilder sb, Node<E> node, String prefix)
+	private void preorder(Node<E> node, Visitor<E> visitor)
 	{
-		if (node == null)
+		if (node == null || visitor.stop)
 			return;
-		sb.append(prefix).append(node.element).append("\n");
-		toString(sb, node.left, prefix + "{L}-");
-		toString(sb, node.right, prefix + "{R}-");
+
+		visitor.stop = visitor.visit(node.element);
+		preorder(node.left, visitor);
+		preorder(node.right, visitor);
+	}
+
+	/**
+	 * 递归实现中序遍历
+	 *
+	 * @param node
+	 * @param visitor
+	 */
+	private void inorder(Node<E> node, Visitor<E> visitor)
+	{
+		if (node == null || visitor.stop)
+			return;
+
+		inorder(node.left, visitor);
+		if (visitor.stop)
+			return;
+		visitor.stop = visitor.visit(node.element);
+		inorder(node.right, visitor);
+
+	}
+
+	private void postorder(Node<E> node, Visitor<E> visitor)
+	{
+		if (node == null || visitor.stop)
+			return;
+
+		postorder(node.left, visitor);
+		postorder(node.right, visitor);
+
+		if (visitor.stop)
+			return;
+
+		visitor.stop = visitor.visit(node.element);
+
+	}
+
+	private int height2(Node<E> root)
+	{
+		// 空树
+		if (root == null)
+			return 0;
+
+		// 关键点在于这个 其实是从最简单的开始 以及明白二叉树递归的遍历原理
+		return 1 + Math.max(height2(root.left), height2(root.right));
+
 	}
 
 }

@@ -14,12 +14,12 @@ import java.util.List;
 public class Main
 {
 	private static List<Integer> list;
-	private static BinarySearchTree<Integer> bsk;
+	private static BST<Integer> bsk;
 
 	static
 	{
 		list = Arrays.asList(19, 5, 8, 71, 34, 73, 30, 98, 83, 69, 63, 42, 44, 62);
-		bsk = new BinarySearchTree<>();
+		bsk = new BST<>();
 		for (Integer i : list)
 		{
 			bsk.add(i);
@@ -52,12 +52,24 @@ public class Main
 		//		System.out.println(bsk.height2());
 		//		System.out.println(bsk.isComplete());
 
-//		BinarySearchTree.Node<Integer> node = bsk.predecessor(bsk.node(16));
-//
-//		if (node != null)
-//			System.out.println(node.element);
+		//		BinarySearchTree.Node<Integer> node = bsk.predecessor(bsk.node(16));
+		//
+		//		if (node != null)
+		//			System.out.println(node.element);
 
-		System.out.println(bsk.inorderTraversal());
+		//		System.out.println(bsk.inorderTraversal());
+
+		/*for (Integer i : list)
+		{
+			System.out.println("============删除_" + i);
+			bsk.remove(i);
+			BinaryTrees.println(bsk);
+
+		}*/
+
+		String str1 = null;
+		String str2 = "123";
+		System.out.println(str1 instanceof String);
 
 	}
 
