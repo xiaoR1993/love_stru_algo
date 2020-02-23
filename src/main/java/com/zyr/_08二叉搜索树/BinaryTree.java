@@ -9,7 +9,8 @@ import java.util.*;
  * @Description 二叉树
  * @Date 2020/1/30
  */
-@SuppressWarnings({ "unused", "unchecked" }) public class BinaryTree<E> implements BinaryTreeInfo
+@SuppressWarnings({"unused", "unchecked"})
+public class BinaryTree<E> implements BinaryTreeInfo
 {
 	// 主要屬性
 	protected int size;
@@ -51,6 +52,7 @@ import java.util.*;
 
 		/**
 		 * 返回兄弟节点
+		 *
 		 * @return
 		 */
 		public Node<E> sibling()
@@ -112,12 +114,12 @@ import java.util.*;
 	 *
 	 * @param visitor
 	 */
-	public void preorder(Visitor<E> visitor)
+	public void preorder2(Visitor<E> visitor)
 	{
 		if (visitor == null)
 			return;
 
-		preorder(root, visitor);
+		preorder2(root, visitor);
 
 	}
 
@@ -155,6 +157,51 @@ import java.util.*;
 			if (node.left != null)
 			{
 				stack.push(node.left);
+			}
+
+		}
+
+	}
+
+	/**
+	 * 使用非递归方式前序遍历二叉树
+	 *
+	 * @param visitor
+	 */
+	// 总结:思路是1路向左的同时 先访问 然后将右节点入栈
+	public void preorder(Visitor<E> visitor)
+	{
+		if (root == null || visitor == null)
+			return;
+
+		Stack<Node<E>> stack = new Stack<>();
+
+		Node<E> node = root;
+
+		while (true)
+		{
+			if (node != null)
+			{
+				// 访问
+				if (visitor.visit(node.element))
+					return;
+
+				// 右边入栈
+				if (node.right != null)
+				{
+					stack.push(node.right);
+				}
+
+				//进行左边
+				node = node.left;
+			}
+			else if (stack.isEmpty())
+			{
+				break;
+			}
+			else
+			{
+				node = stack.pop();
 			}
 
 		}
@@ -248,15 +295,57 @@ import java.util.*;
 	}
 
 	/**
+	 * 非递归中序遍历
+	 *
+	 * @param visitor
+	 */
+	// 总结:思路是一路向左 中间元素入栈 访问完毕转换到右边
+	public void inorder(Visitor<E> visitor)
+	{
+		if (root == null || visitor == null)
+			return;
+
+		Stack<Node<E>> stack = new Stack<>();
+
+		Node<E> node = root;
+
+		while (true)
+		{
+
+			if (node != null)
+			{
+				stack.push(node);
+				node = node.left;
+			}
+			else if (stack.isEmpty())
+			{
+				break;
+			}
+			else
+			{
+				node = stack.pop();
+
+				if (visitor.visit(node.element))
+					return;
+
+				node = node.right;
+
+			}
+
+		}
+
+	}
+
+	/**
 	 * 中序遍历
 	 *
 	 * @param visitor
 	 */
-	public void inorder(Visitor<E> visitor)
+	public void inorder2(Visitor<E> visitor)
 	{
 		if (visitor == null)
 			return;
-		inorder(root, visitor);
+		inorder2(root, visitor);
 	}
 
 	/**
@@ -344,16 +433,56 @@ import java.util.*;
 	}
 
 	/**
+	 * 非递归后序遍历
+	 *
+	 * @param visitor
+	 */
+	// 总结:精髓在于先入栈 然后是子节点并且上一次访问的节点的父节点是当前节点才访问
+	public void postorder(Visitor<E> visitor)
+	{
+		if (root == null || visitor == null)
+			return;
+
+		Stack<Node<E>> stack = new Stack<>();
+
+		stack.push(root);
+		Node<E> prev = null;
+		while (!stack.isEmpty())
+		{
+			Node<E> top = stack.peek();
+			if (top.isLeaf() || (prev != null && prev.parent == top))
+			{
+				Node<E> node = stack.pop();
+				if (visitor.visit(node.element))
+					return;
+				prev = node;
+				continue;
+			}
+			if (top.right != null)
+			{
+				stack.push(top.right);
+			}
+
+			if (top.left != null)
+			{
+				stack.push(top.left);
+			}
+
+		}
+
+	}
+
+	/**
 	 * 后序遍历 使用递归
 	 *
 	 * @param visitor
 	 */
-	public void postorder(Visitor<E> visitor)
+	public void postorder2(Visitor<E> visitor)
 	{
 		if (visitor == null)
 			return;
 
-		postorder(root, visitor);
+		postorder2(root, visitor);
 
 	}
 
@@ -677,7 +806,8 @@ import java.util.*;
 	/**
 	 * who is the root node
 	 */
-	@Override public Object root()
+	@Override
+	public Object root()
 	{
 		return root;
 	}
@@ -687,7 +817,8 @@ import java.util.*;
 	 *
 	 * @param node
 	 */
-	@Override public Object left(Object node)
+	@Override
+	public Object left(Object node)
 	{
 		return ((BST.Node) node).left;
 	}
@@ -697,7 +828,8 @@ import java.util.*;
 	 *
 	 * @param node
 	 */
-	@Override public Object right(Object node)
+	@Override
+	public Object right(Object node)
 	{
 		return ((BST.Node) node).right;
 	}
@@ -707,7 +839,8 @@ import java.util.*;
 	 *
 	 * @param node
 	 */
-	@Override public Object string(Object node)
+	@Override
+	public Object string(Object node)
 	{
 //		return ((BST.Node) node).element;
 		return node;
@@ -731,7 +864,8 @@ import java.util.*;
 		toString(sb, node.right, prefix + "{R}-");
 	}
 
-	@Override public String toString()
+	@Override
+	public String toString()
 	{
 
 		StringBuilder sb = new StringBuilder();
@@ -748,14 +882,14 @@ import java.util.*;
 	 * @param node
 	 * @param visitor
 	 */
-	private void preorder(Node<E> node, Visitor<E> visitor)
+	private void preorder2(Node<E> node, Visitor<E> visitor)
 	{
 		if (node == null || visitor.stop)
 			return;
 
 		visitor.stop = visitor.visit(node.element);
-		preorder(node.left, visitor);
-		preorder(node.right, visitor);
+		preorder2(node.left, visitor);
+		preorder2(node.right, visitor);
 	}
 
 	/**
@@ -764,26 +898,26 @@ import java.util.*;
 	 * @param node
 	 * @param visitor
 	 */
-	private void inorder(Node<E> node, Visitor<E> visitor)
+	private void inorder2(Node<E> node, Visitor<E> visitor)
 	{
 		if (node == null || visitor.stop)
 			return;
 
-		inorder(node.left, visitor);
+		inorder2(node.left, visitor);
 		if (visitor.stop)
 			return;
 		visitor.stop = visitor.visit(node.element);
-		inorder(node.right, visitor);
+		inorder2(node.right, visitor);
 
 	}
 
-	private void postorder(Node<E> node, Visitor<E> visitor)
+	private void postorder2(Node<E> node, Visitor<E> visitor)
 	{
 		if (node == null || visitor.stop)
 			return;
 
-		postorder(node.left, visitor);
-		postorder(node.right, visitor);
+		postorder2(node.left, visitor);
+		postorder2(node.right, visitor);
 
 		if (visitor.stop)
 			return;

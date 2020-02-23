@@ -85,7 +85,7 @@ public class TreeSet<E> implements Set<E>
 
 	@Override public void traversal(Visitor<E> visitor)
 	{
-		tree.inorder(new BinaryTree.Visitor<E>()
+		tree.inorder2(new BinaryTree.Visitor<E>()
 		{
 			@Override public boolean visit(E element)
 			{
